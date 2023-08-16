@@ -27,7 +27,7 @@ pipeline {
         
         stage('Deploy to TomcatServer') {
             steps {
-                sh 'sudo cp target/*.war /opt/apache-tomcat-9.0.65/webapps'
+                sh 'sudo cp -r target/*.war /opt/apache-tomcat-9.0.65/webapps'
             }
         }
     }
