@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     tools {
-        // Define the Maven tool using its name
-        maven 'M2_HOME' // Make sure 'M2_HOME' matches the tool configuration in Jenkins
+        maven 'M2_HOME'
     }
 
     stages {
@@ -24,7 +23,21 @@ pipeline {
                 sh 'mvn package'
             }
         }
-        
+
+        stage('Static Code Analysis') {
+            environment {
+                SONAR_URL = "http://44.211.125.22:9000/"
+            }
+            steps {
+                withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_AUTH_TOKEN')]) {
+                    sh '''
+                        cd /Apache-tomcat.git
+                        mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}
+                    '''
+                }
+            }
+        }
+
         stage('Deploy to TomcatServer') {
             steps {
                 sh 'sudo cp -r target/*.war /opt/apache-tomcat-9.0.65/webapps'
